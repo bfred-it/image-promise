@@ -12,15 +12,14 @@ function isArrayLike(input: any): input is ArrayLike<Input> {
 
 function loadSingleImage(image: HTMLImageElement): ImagePromise {
 	const promise = new Promise<HTMLImageElement>((resolve, reject) => {
-		if (image.naturalWidth) {
-			// If the browser can determine the naturalWidth the image is already loaded successfully
-			resolve(image);
-		} else if (image.complete) {
-			// If the image is complete but the naturalWidth is 0px it is probably broken
-			reject(image);
-		} else {
+		if (!image.complete) {
 			image.addEventListener('load', fulfill);
 			image.addEventListener('error', fulfill);
+		} else if (image.naturalWidth) {
+			// If the image is complete but the naturalWidth is 0px it is probably broken
+			resolve(image);
+		} else {
+			reject(image);
 		}
 
 		function fulfill(): void {
